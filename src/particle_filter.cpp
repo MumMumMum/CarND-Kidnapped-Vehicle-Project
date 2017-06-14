@@ -24,7 +24,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     //   x, y, theta and their uncertainties from GPS) and all weights to 1.
     // Add random Gaussian noise to each particle.
     // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-    num_particles = 1;
+    num_particles = 100;
     is_initialized = false;
     std_x = std[0];
     std_y = std[1];
@@ -202,7 +202,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
         for (unsigned int j = 0; j < trans_maped.size(); j++) {
 
             // placeholders for observation and associated prediction coordinates
-
+           // total_prob= 1.0;
             double o_x = trans_maped[j].x;
             double o_y = trans_maped[j].y;
             int o_id   = trans_maped[j].id;
@@ -265,7 +265,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     }//i ends
     //normalize the wt
     total_weight = 1.0;
-    //total_weight = std::accumulate(particles.begin(), particles.end(), 0.0);
+    total_weight = std::accumulate(weights.begin(), weights.end(),0.0);
     weights.clear();
     for (int i = 0 ; i < num_particles;i++){
         particles[i].weight = particles[i].weight /total_weight;
