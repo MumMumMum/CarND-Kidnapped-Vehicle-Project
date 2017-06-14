@@ -265,7 +265,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     }//i ends
     //normalize the wt
     total_weight = 1.0;
-    total_weight = std::accumulate(particles.begin(), particles.end(), 0.0);
+    //total_weight = std::accumulate(particles.begin(), particles.end(), 0.0);
     weights.clear();
     for (int i = 0 ; i < num_particles;i++){
         particles[i].weight = particles[i].weight /total_weight;
