@@ -47,7 +47,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         particles.push_back(p);
         //printf("the initalized particles are x y theta, %f %f %f ",p.x,p.y,p.theta);
         //cout<<endl;
-        //weights.push_back(1.0);
+        weights.push_back(1.0);
     }
     is_initialized = true;
 
@@ -84,13 +84,13 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 
         }
 
-        normal_distribution<double > dist_x(0 ,std_x);
-        normal_distribution<double > dist_y(0, std_y);
-        normal_distribution<double > dist_theta(0, std_theta);
+        normal_distribution<double > dist_x(newx ,std_x);
+        normal_distribution<double > dist_y(newy, std_y);
+        normal_distribution<double > dist_theta(newtheta, std_theta);
         //add random noise
-        particles[i].x = newx+dist_x(gen);
-        particles[i].y = newy+dist_y(gen);
-        particles[i].theta = newtheta+dist_theta(gen);
+        particles[i].x = dist_x(gen);
+        particles[i].y = dist_y(gen);
+        particles[i].theta = dist_theta(gen);
         //printf("prdicted x y  theta are as  follows %f %f %f",particles[i].x,particles[i].y,particles[i].theta);
         //cout<<endl;
         //std::cout<<"---------------------Prediction Calc------------------------"<<std::endl;
