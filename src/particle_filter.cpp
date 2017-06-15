@@ -45,8 +45,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         p.theta = dist_theta(gen);
         p.weight = 1;
         particles.push_back(p);
-        printf("the initalized particles are x y theta, %f %f %f ",p.x,p.y,p.theta);
-        cout<<endl;
+        //printf("the initalized particles are x y theta, %f %f %f ",p.x,p.y,p.theta);
+        //cout<<endl;
         //weights.push_back(1.0);
     }
     is_initialized = true;
@@ -66,33 +66,36 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     double std_y = std_pos[1];
     double std_theta =std_pos[2];
     for (int i = 0; i < num_particles; i++){
+        double x = particles[i].x;
+        double y = particles[i].y;
+        double theta = particles[i].theta;
         if(yaw_rate < 0.00001){
 
-            newx = particles[i].x+velocity * delta_t * cos(particles[i].theta);
-            newy = particles[i].y+velocity * delta_t * sin(particles[i].theta);
+            newx = x+velocity * delta_t * cos(particles[i].theta);
+            newy = y+velocity * delta_t * sin(particles[i].theta);
             //particles[i].theta+=yaw_rate*delta_t;
             newtheta = particles[i].theta;
 
         }
         else{
-            newx     = particles[i].x+(velocity/yaw_rate )*(sin(particles[i].theta+(yaw_rate*delta_t))-sin(particles[i].theta));
-            newy     = particles[i].y+(velocity/yaw_rate )*(cos(particles[i].theta) - cos(particles[i].theta+(yaw_rate*delta_t)));
-            newtheta =yaw_rate*delta_t;
+            newx     = x+(velocity/yaw_rate )*(sin(particles[i].theta+(yaw_rate*delta_t))-sin(particles[i].theta));
+            newy     = y+(velocity/yaw_rate )*(cos(particles[i].theta) - cos(particles[i].theta+(yaw_rate*delta_t)));
+            newtheta = theta+(yaw_rate*delta_t);
 
         }
 
-        normal_distribution<double > dist_x(newx ,std_x);
-        normal_distribution<double > dist_y(newy, std_y);
-        normal_distribution<double > dist_theta(newtheta, std_theta);
+        normal_distribution<double > dist_x(0 ,std_x);
+        normal_distribution<double > dist_y(0, std_y);
+        normal_distribution<double > dist_theta(0, std_theta);
         //add random noise
-        particles[i].x += dist_x(gen);
-        particles[i].y += dist_y(gen);
-        particles[i].theta += dist_theta(gen);
+        particles[i].x = newx+dist_x(gen);
+        particles[i].y = newy+dist_y(gen);
+        particles[i].theta = newtheta+dist_theta(gen);
         //printf("prdicted x y  theta are as  follows %f %f %f",particles[i].x,particles[i].y,particles[i].theta);
         //cout<<endl;
-        std::cout<<"---------------------Prediction Calc------------------------"<<std::endl;
-        std::cout << "Velocity:"<<velocity<<";Yawrate:"<<yaw_rate<<std::endl;
-        std ::cout <<"Predicted:x,y,theta:"<<particles[i].x<<" , "<<particles[i].y<<" , "<<particles[i].theta<<std::endl;
+        //std::cout<<"---------------------Prediction Calc------------------------"<<std::endl;
+        //std::cout << "Velocity:"<<velocity<<";Yawrate:"<<yaw_rate<<std::endl;
+        //std ::cout <<"Predicted:x,y,theta:"<<particles[i].x<<" , "<<particles[i].y<<" , "<<particles[i].theta<<std::endl;
 
     }
 
@@ -120,7 +123,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
             if(meas_dist < min_dist){
                 min_dist = meas_dist;
-                cout<<"meas_dist:  "<<meas_dist<<" , "<< "LandMark(x,y): "<<pred.x<<","<<pred.y<<endl;
+                //cout<<"meas_dist:  "<<meas_dist<<" , "<< "LandMark(x,y): "<<pred.x<<","<<pred.y<<endl;
 
                 map_id = pred.id;
 
@@ -132,8 +135,8 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
         observations[i].id = map_id;
         //printf("the transformed observed land(x,y) id  mark in DA function %f %f %d ",obsv.x,obsv.y,observations[i].id);
         //cout<<endl;
-        std::cout <<"Landmark Index: "<<observations[i].id <<
-        " TObservation(x,y): "<<"("<<observations[i].x<<","<<observations[i].y<<")"<<std::endl;
+        //std::cout <<"Landmark Index: "<<observations[i].id <<
+        //" TObservation(x,y): "<<"("<<observations[i].x<<","<<observations[i].y<<")"<<std::endl;
         //std::cout <<"Predicted(x,y): "<<"("<<predicted[index].x<<","<<predicted[index].y<<")"<<"Dist:"<<min_dist<<std::endl;
     }
 
@@ -180,7 +183,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                 //cout<<endl;
                 //printf("landmark in range ,%d %f %f",lid ,lx,ly);
                 //cout<<endl;
-                cout<<"Land Mark in Range:id,x,y:"<<lid<<","<<lx<<","<<ly<<endl;
+                //cout<<"Land Mark in Range:id,x,y:"<<lid<<","<<lx<<","<<ly<<endl;
             }
 
         }
@@ -193,8 +196,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             trans_maped.push_back(LandmarkObs{observations[j].id,x,y});
             //printf("transformed observations in range,%d %f %f",observations[j].id,x,y);
             //cout<<endl;
-            std::cout<<"Obs(x,y)"<<"("<<observations[j].x <<","<<observations[j].y<< ")";
-            std::cout<<"-->TObs(x,y)"<<"("<<x<<","<<trans_maped[j].y<< ")"<<std::endl;
+            //std::cout<<"Obs(x,y)"<<"("<<observations[j].x <<","<<observations[j].y<< ")";
+            //std::cout<<"-->TObs(x,y)"<<"("<<x<<","<<trans_maped[j].y<< ")"<<std::endl;
         }
         std::cout<<"---------------------Assosciations------------------------"<<std::endl;
         dataAssociation(landMarks_inRange,trans_maped);
@@ -224,11 +227,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                     pr_x = landMarks_inRange[k].x;
                     pr_y = landMarks_inRange[k].y;
                     //cout<<"id in "<< trans_maped[j].id<<endl;
-                    std::cout<<"LandmarkIndex :"<<landMarks_inRange[k].id<<std::endl;
+                    //std::cout<<"LandmarkIndex :"<<landMarks_inRange[k].id<<std::endl;
                 }
             }
 
-            std::cout<<"Landmark(x,y):"<<"("<<pr_x<<","<<pr_y<<"); Particle(x,y):("<<o_x<<","<<o_y<<")"<<std::endl;
+            //std::cout<<"Landmark(x,y):"<<"("<<pr_x<<","<<pr_y<<"); Particle(x,y):("<<o_x<<","<<o_y<<")"<<std::endl;
 
             //std::cout << "the pr_arr and pr x ny is"<<pr_x,pr_y,pr_arr[0],pr_arr[1]<<endl
 
@@ -240,8 +243,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             double c3 = 2*(s_y*s_y);//(2 * pow(s_y, 2));
             double dx = o_x - pr_x;
             double dy = o_y - pr_y;
-            double dxdx = dx*dx/c2;
-            double dydy = dy*dy/c3;
+            double dxdx = (dx*dx)/c2;
+            double dydy = (dy*dy)/c3;
             //double c4 = exp(-((pow(dx, 2) / c2)+ (pow(dy, 2) / c3)));
             double c4 = exp(-(dxdx+ dydy));
             double obs_w = c1 *c4;
@@ -259,13 +262,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             //printf("landmarks  x,y observation x,y  particlewt %f %f %f %f %f ",pr_x,pr_y,o_x,o_y,particles[i].weight);
             //printf("the predicted pos wt is   %d  %f \n",trans_maped[j].id,particles[i].weight);
             //cout<<endl;
-            std::cout<<"dx:"<<dx<<";"<<"dy:"<<dy<<std::endl;
-            std::cout<<"proba for the obsv is : "<<obs_w<<" total prob is: "<<total_prob<<std::endl;
+            //std::cout<<"dx:"<<dx<<";"<<"dy:"<<dy<<std::endl;
+            //std::cout<<"proba for the obsv is : "<<obs_w<<" total prob is: "<<total_prob<<std::endl;
         }//j ends
 
         particles[i].weight = total_prob;
         weights.push_back( total_prob);
-        std::cout <<"particles[i].weight " <<i<< "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
+        //std::cout <<"particles[i].weight " <<i<< "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
     }//i ends
     //normalize the wt
     //total_weight = 1.0;
@@ -274,7 +277,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     for (int i = 0 ; i < num_particles;i++){
         particles[i].weight = particles[i].weight /total_weight;
         weights[i] = particles[i].weight;
-        std::cout <<"Weight " <<i<< "="<< weights[i]<<std::endl;
+        //std::cout <<"Weight " <<i<< "="<< weights[i]<<std::endl;
 
     }
 }//fun ends
@@ -295,7 +298,7 @@ void ParticleFilter::resample() {
     }
     cout<<"push wt done"<<endl;*/
     double max_weight = *max_element(weights.begin(), weights.end());
-    cout<<"max_weight"<<max_weight<<endl;
+    //cout<<"max_weight"<<max_weight<<endl;
 
     //std::uniform_discrete_distribution<int>     distr_index(0, num_particles-1);
     std::uniform_real_distribution<double>      distr_weight(0.0, max_weight);
@@ -316,7 +319,7 @@ void ParticleFilter::resample() {
     }
     particles.clear();
     particles = std::move (particle_sampled);
-
+    std::cout<<"---------------------Weights Calc------------------------"<<std::endl;
     //cout<<"resample done"<<endl;
 }
 
