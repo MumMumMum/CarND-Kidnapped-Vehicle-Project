@@ -176,14 +176,14 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             double landMark_dist = dist(lx,ly,p.x,p.y);
 
             //if( fabs(lx - p.x) <= sensor_range && fabs(ly-p.y) <= sensor_range){
-            if( landMark_dist <= sensor_range){
+            if( landMark_dist < sensor_range){
 
                 landMarks_inRange.push_back(LandmarkObs{lid,lx,ly});
                 //printf("sensor rnage is  %f",sensor_range);
                 //cout<<endl;
                 //printf("landmark in range ,%d %f %f",lid ,lx,ly);
                 //cout<<endl;
-                //cout<<"Land Mark in Range:id,x,y:"<<lid<<","<<lx<<","<<ly<<endl;
+                cout<<"Land Mark in Range:id,x,y:"<<lid<<","<<lx<<","<<ly<<endl;
             }
 
         }
@@ -196,8 +196,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             trans_maped.push_back(LandmarkObs{observations[j].id,x,y});
             //printf("transformed observations in range,%d %f %f",observations[j].id,x,y);
             //cout<<endl;
-            //std::cout<<"Obs(x,y)"<<"("<<observations[j].x <<","<<observations[j].y<< ")";
-            //std::cout<<"-->TObs(x,y)"<<"("<<x<<","<<trans_maped[j].y<< ")"<<std::endl;
+            std::cout<<"Obs(x,y)"<<"("<<observations[j].x <<","<<observations[j].y<< ")";
+            std::cout<<"-->TObs(x,y)"<<"("<<x<<","<<trans_maped[j].y<< ")"<<std::endl;
         }
         std::cout<<"---------------------Assosciations------------------------"<<std::endl;
         dataAssociation(landMarks_inRange,trans_maped);
@@ -227,11 +227,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                     pr_x = landMarks_inRange[k].x;
                     pr_y = landMarks_inRange[k].y;
                     //cout<<"id in "<< trans_maped[j].id<<endl;
-                    //std::cout<<"LandmarkIndex :"<<landMarks_inRange[k].id<<std::endl;
+                    std::cout<<"LandmarkIndex :"<<landMarks_inRange[k].id<<std::endl;
                 }
             }
 
-            //std::cout<<"Landmark(x,y):"<<"("<<pr_x<<","<<pr_y<<"); Particle(x,y):("<<o_x<<","<<o_y<<")"<<std::endl;
+            std::cout<<"Landmark(x,y):"<<"("<<pr_x<<","<<pr_y<<"); Particle(x,y):("<<o_x<<","<<o_y<<")"<<std::endl;
 
             //std::cout << "the pr_arr and pr x ny is"<<pr_x,pr_y,pr_arr[0],pr_arr[1]<<endl
 
@@ -262,13 +262,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             //printf("landmarks  x,y observation x,y  particlewt %f %f %f %f %f ",pr_x,pr_y,o_x,o_y,particles[i].weight);
             //printf("the predicted pos wt is   %d  %f \n",trans_maped[j].id,particles[i].weight);
             //cout<<endl;
-            //std::cout<<"dx:"<<dx<<";"<<"dy:"<<dy<<std::endl;
+            std::cout<<"dx:"<<dx<<";"<<"dy:"<<dy<<std::endl;
             //std::cout<<"proba for the obsv is : "<<obs_w<<" total prob is: "<<total_prob<<std::endl;
         }//j ends
 
         particles[i].weight = total_prob;
         weights.push_back( total_prob);
-        //std::cout <<"particles[i].weight " <<i<< "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
+        std::cout <<"particles[i].weight " <<i<< "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
     }//i ends
     //normalize the wt
     //total_weight = 1.0;
