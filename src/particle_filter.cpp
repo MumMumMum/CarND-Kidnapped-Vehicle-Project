@@ -26,9 +26,9 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
     num_particles = 100;
     is_initialized = false;
-    std_x = std[0];
-    std_y = std[1];
-    std_theta = std[2];
+    double std_x = std[0];
+    double std_y = std[1];
+    double std_theta = std[2];
     particles.clear();
     weights.clear();
 
@@ -62,6 +62,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     // add gaussian nois to filter
 
     double newx,newy,newtheta;
+    double std_x = std_pos[0];
+    double std_y = std_pos[1];
+    double std_theta =std_pos[2];
     for (int i = 0; i < num_particles; i++){
         if(yaw_rate < 0.00001){
 
@@ -117,8 +120,8 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
             if(meas_dist < min_dist){
                 min_dist = meas_dist;
-                //printf("meas_dist and pred_id  obsv x,y pred x,y,%f  %d  %f %f %f %f ",meas_dist,pred.id,obsv.x, obsv.x, pred.x,pred.y);
-                //cout<<endl;
+                cout<<"meas_dist:  "<<meas_dist<<" , "<< "LandMark(x,y): "<<pred.x<<","<<pred.y<<endl;
+
                 map_id = pred.id;
 
             }
@@ -129,7 +132,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
         observations[i].id = map_id;
         //printf("the transformed observed land(x,y) id  mark in DA function %f %f %d ",obsv.x,obsv.y,observations[i].id);
         //cout<<endl;
-        std::cout <<"Landmark Index:(In Tobservation)"<<observations[i].id <<
+        std::cout <<"Landmark Index: "<<observations[i].id <<
         " TObservation(x,y): "<<"("<<observations[i].x<<","<<observations[i].y<<")"<<std::endl;
         //std::cout <<"Predicted(x,y): "<<"("<<predicted[index].x<<","<<predicted[index].y<<")"<<"Dist:"<<min_dist<<std::endl;
     }
@@ -250,13 +253,14 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
             // product of this obersvation weight with total observations weight
             //printf("paricle init wt and wt from cal is %f and %f ",particles[i].weight,obs_w);
-
+            //cout<<"total_prob befor:"<<total_prob<<"for observation :"<<j<<endl;
             total_prob *= obs_w;
+            //cout<<"total_prob after:"<<total_prob<<"for observation :"<<j<<endl;
             //printf("landmarks  x,y observation x,y  particlewt %f %f %f %f %f ",pr_x,pr_y,o_x,o_y,particles[i].weight);
             //printf("the predicted pos wt is   %d  %f \n",trans_maped[j].id,particles[i].weight);
             //cout<<endl;
             std::cout<<"dx:"<<dx<<";"<<"dy:"<<dy<<std::endl;
-            std::cout<<"Multivalriate gaussian term is : "<<obs_w<<std::endl;
+            std::cout<<"proba for the obsv is : "<<obs_w<<" total prob is: "<<total_prob<<std::endl;
         }//j ends
 
         particles[i].weight = total_prob;
@@ -264,9 +268,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
         std::cout <<"particles[i].weight " <<i<< "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
     }//i ends
     //normalize the wt
-    total_weight = 1.0;
+    //total_weight = 1.0;
     total_weight = std::accumulate(weights.begin(), weights.end(),0.0);
-    weights.clear();
+    //weights.clear();
     for (int i = 0 ; i < num_particles;i++){
         particles[i].weight = particles[i].weight /total_weight;
         weights[i] = particles[i].weight;
