@@ -268,7 +268,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
         particles[i].weight = total_prob;
         weights.push_back( total_prob);
-        std::cout <<"particles[i].weight " <<i<< "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
+        std::cout <<i <<" :particles[i].weight " << "="<< particles[i].weight<<"calc total prob = "<<total_prob<<std::endl;
     }//i ends
     //normalize the wt
     //total_weight = 1.0;
@@ -302,24 +302,26 @@ void ParticleFilter::resample() {
 
     //std::uniform_discrete_distribution<int>     distr_index(0, num_particles-1);
     std::uniform_real_distribution<double>      distr_weight(0.0, max_weight);
-    std::discrete_distribution<>     distr_index(weights.begin(), weights.end());
+    std::discrete_distribution<int>     distr_index(weights.begin(), weights.end());
     vector<Particle> particle_sampled;
     for(int i = 0; i < num_particles;i++){
-        index = distr_index(gen);
+        auto index = distr_index(gen);
 
-        beta += 2*max_weight;
+        /*beta += 2*max_weight;
         while(weights[index] < beta){
 
             beta = beta - weights[index];
             index = (index +1) %num_particles;
-            //cout<<"index  "<<index<<endl;
-        }
+
+        }*/
+        index = (index ) %num_particles;
+        cout<<"index  "<<index<<endl;
         particle_sampled.push_back(particles[index]);
         //cout<<"get wt done"<<index<<endl;
     }
     particles.clear();
     particles = std::move (particle_sampled);
-    std::cout<<"---------------------Weights Calc------------------------"<<std::endl;
+    std::cout<<"---------------------resmaple Calc  done------------------------"<<std::endl;
     //cout<<"resample done"<<endl;
 }
 
