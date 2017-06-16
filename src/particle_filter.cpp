@@ -25,30 +25,33 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     //   x, y, theta and their uncertainties from GPS) and all weights to 1.
     // Add random Gaussian noise to each particle.
     // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-    num_particles = 100;
-    is_initialized = false;
-    const double std_x = std[0];
-    const double std_y = std[1];
-    double std_theta = std[2];
-    particles.clear();
-    weights.clear();
-    default_random_engine gen;
-    normal_distribution<double> dist_x(x, std_x);
-    normal_distribution<double> dist_y(y, std_y);
-    normal_distribution<double> dist_theta(theta, std_theta);
-    //normal_distribution<double > dist_noise(0,0.01);
-    //double newx,newy,newtheta;
-    for (int i = 0; i < num_particles; i++) {
-        Particle p;
 
-        p.x = dist_x(gen);
-        p.y = dist_y(gen);
-        p.theta = dist_theta(gen);
-        p.weight = 1;
-        particles.push_back(p);
-        //printf("the initalized particles are x y theta, %f %f %f ",p.x,p.y,p.theta);
-        //cout<<endl;
-        weights.push_back(1.0);
+    if(!is_initialized ) {
+        num_particles = 9;
+
+        const double std_x = std[0];
+        const double std_y = std[1];
+        double std_theta = std[2];
+        particles.clear();
+        weights.clear();
+        default_random_engine gen;
+        normal_distribution<double> dist_x(x, std_x);
+        normal_distribution<double> dist_y(y, std_y);
+        normal_distribution<double> dist_theta(theta, std_theta);
+        //normal_distribution<double > dist_noise(0,0.01);
+        //double newx,newy,newtheta;
+        for (int i = 0; i < num_particles; i++) {
+            Particle p;
+
+            p.x = dist_x(gen);
+            p.y = dist_y(gen);
+            p.theta = dist_theta(gen);
+            p.weight = 1;
+            particles.push_back(p);
+            //printf("the initalized particles are x y theta, %f %f %f ",p.x,p.y,p.theta);
+            //cout<<endl;
+            weights.push_back(1.0);
+        }
     }
     is_initialized = true;
 
@@ -120,15 +123,16 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
     for (int i = 0; i < observations.size(); i++) {
         int map_id = 0;
         LandmarkObs obsv = observations[i];
-        double min_dist = std::numeric_limits<double>::max();
-
+        //double min_dist = std::numeric_limits<double>::max();
+        double min_dist = 1000.00;
         for (int j = 0; j < predicted.size(); j++) {
 
             LandmarkObs pred = predicted[j];
             double meas_dist = dist(obsv.x, obsv.y, pred.x, pred.y);
+            cout<<"meas_dist:  "<<meas_dist<<" , "<< "LandMark(x,y): "<<pred.x<<","<<pred.y<<", "<<pred.id<<endl;
             if (meas_dist < min_dist) {
                 min_dist = meas_dist;
-                //cout<<"meas_dist:  "<<meas_dist<<" , "<< "LandMark(x,y): "<<pred.x<<","<<pred.y<<endl;
+                //cout<<"meas_dist:  "<<meas_dist<<" , "<< "LandMark(x,y): "<<pred.x<<","<<pred.y<<", "<<pred.id<<endl;
                 map_id = pred.id;
             }
 
@@ -136,9 +140,9 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
         }
 
         observations[i].id = map_id;
-        //std::cout <<"Landmark Index: "<<observations[i].id <<
-        //" TObservation(x,y): "<<"("<<observations[i].x<<","<<observations[i].y<<")"<<std::endl;
-        //std::cout <<"Predicted(x,y): "<<"("<<predicted[index].x<<","<<predicted[index].y<<")"<<"Dist:"<<min_dist<<std::endl;
+        std::cout <<"Landmark Index: "<<observations[i].id <<
+        " TObservation(x,y): "<<"("<<observations[i].x<<","<<observations[i].y<<")"<<std::endl;
+
     }
 
 
@@ -235,7 +239,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             double obs_w = c1 * c4;
             //cout<<"total_prob befor:"<<total_prob<<"for observation :"<<j<<endl;
             total_prob *= obs_w;
-            std::cout << "dx:" << dx << ";" << "dy:" << dy << std::endl;
+            std::cout << "dx:" << dx << ";" << "dy:" << dy << " prob for observation:"<<obs_w<<"total Prob: "<<total_prob<<std::endl;
 
         }//j ends
 
